@@ -43,5 +43,12 @@ VALIDATE $? "enabling mysqld service"
 systemctl start mysqld &>> $LOG_FILE
 VALIDATE $? "starting mysqld service"  
 
-mysql_secure_installation --set-root-pass ExpenseApp@1 &>> $LOG_FILE
-VALIDATE $? "setting root password for mysql"
+mysql -h mysql.jyothsna.online -u root -pExpenseApp@1 -e 'show databases;' &>> $LOG_FILE
+if [ $? -ne 0 ]
+then
+    echo -e "$R Failed to connect to MySQL $N" &>>$LOG_FILE
+    mysql_secure_installation --set-root-pass ExpenseApp@1
+    VALIDATE $? "setting root password for mysql"
+else
+    echo -e "Mysql password is already setup... $Y Skipping $N" | tee -a $LOG_FILE
+fi
